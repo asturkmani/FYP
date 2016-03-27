@@ -48,29 +48,45 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         // Dispose of any resources that can be recreated.
     }
     
+    //location has been updated. Send new loaction to server.
     func locationManager(manager:CLLocationManager, didUpdateLocations locations:[CLLocation]) {
         status.text = "\(locations[0])"
 //        myLocations.append(locations[0] )
         
+        //SET IF CONDITION THAT DISTANCE CHANGED BY A CERTAIN FACTOR.
+        //SET CONDITION TO IDENTIFY EACH UNIQUE TRANSMISSION.
+        let client:TCPClient = TCPClient(addr: "fypaji.ddns.net", port:60000)
+        let (success, errmsg) = client.connect(timeout: 10)
+        if success {
+//            sendTCPMessage("\(locations[0])", client: client)
+        } else {
+            print(errmsg)
+        }
+        
+        //refocus map region.
         let spanX = 0.007
         let spanY = 0.007
         let newRegion = MKCoordinateRegion(center: theMap.userLocation.coordinate, span: MKCoordinateSpanMake(spanX, spanY))
         theMap.setRegion(newRegion, animated: true)
-        
-//        if (myLocations.count > 1){
-//            let sourceIndex = myLocations.count - 1
-//            let destinationIndex = myLocations.count - 2
-        
-//            let c1 = myLocations[sourceIndex].coordinate
-//            let c2 = myLocations[destinationIndex].coordinate
-//            var a = [c1, c2]
-//            let polyline = MKPolyline(coordinates: &a, count: a.count)
-//            theMap.addOverlay(polyline)
-//        }
     }
     
+    func sendTCPMessage(data: String, client: TCPClient?){
+        //send TCP message data to address specified in client
+        let (success, errmsg) = client!.send(str:data)
+        if success{
+            // do something, maybe get a response data?
+            print("connection successful")
+        } else {
+            print(errmsg)
+        }
+    }
+}
+
+
+
+// Old code
 //    func mapView(mapView: MKMapView, rendererForOverlay overlay: MKOverlay) -> MKOverlayRenderer {
-//        
+//
 //        if overlay is MKPolyline {
 //            let polylineRenderer = MKPolylineRenderer(overlay: overlay)
 //            polylineRenderer.strokeColor = UIColor.blueColor()
@@ -80,6 +96,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
 //        return MKPolylineRenderer()
 //    }
 
+// inside location manager
 
-}
+//        if (myLocations.count > 1){
+//            let sourceIndex = myLocations.count - 1
+//            let destinationIndex = myLocations.count - 2
 
+//            let c1 = myLocations[sourceIndex].coordinate
+//            let c2 = myLocations[destinationIndex].coordinate
+//            var a = [c1, c2]
+//            let polyline = MKPolyline(coordinates: &a, count: a.count)
+//            theMap.addOverlay(polyline)
+//        }
