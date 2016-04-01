@@ -8,13 +8,14 @@
 
 %The estimated amount of demand in each sector. 
 sectorDemand=[3 10 2; 4 0 1; 0 0 2];
-rowLength=3;
-columnLength=3;
-dimensions =[rowLength columnLength];
+dimensions = size(sectorDemand);
+rowLength = dimensions(1);
+columnLength=dimensions(2);
+
 CAP=8;
 numberOfBlimps=3;
 GPSMap=[[0;2] [1;2] [2;2] [0;1] [1;1] [2;1] [0;0] [1;0] [2;0]]; %Use this to assign each sector a Lat/Long Location. (1xn format)
-initializing=false; %is this the fist time we call the optimizer or not
+initializing=0; %is this the fist time we call the optimizer or not
 penaltyGain=1; %Increase this to make moving less likely
 
 
@@ -33,7 +34,7 @@ min=ones(1,numberOfBlimps);
 max=length(demandTemp)*ones(1,numberOfBlimps);
 integerConstraint=[1:numberOfBlimps];
 
-if initializing == true
+if initializing == 1
     
     currentL=[];
     
