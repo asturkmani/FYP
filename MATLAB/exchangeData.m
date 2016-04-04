@@ -73,7 +73,7 @@ tic
             end;
             % wait for samplingrate for client to connect server socket
             server_socket = ServerSocket(output_port);
-            server_socket.setSoTimeout(samplingrate*1);
+%             server_socket.setSoTimeout(samplingrate*1);
 
             output_socket = server_socket.accept;
 
