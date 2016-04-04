@@ -1,12 +1,27 @@
 % MATLAB multithreaded server
 
+% TODO LIST:
+% 
+% 1) make script for initialisations
+% 2) create data structures to store latest data from users and clients
 %% Import required java packages and setup
-import java.net.*
 import java.io.*
+import java.net.*
 
 %start measuring time.
 tic
-
+%% Initialising
+CAP=8;
+% MUST COME FROM LABVIEW 
+numberOfBlimps=3;
+GPSMap=[[0;2] [1;2] [2;2] [0;1] [1;1] [2;1] [0;0] [1;0] [2;0]]; %Use this to assign each sector a Lat/Long Location. (1xn format)
+penaltyGain=1; %Increase this to make moving less likely
+host='localhost';   
+initializing=1;
+input_socket = [];
+message_in = [];
+sectorDemand=ones(3);
+%OptimizationSetup
 % create required tables
 rios = [];
 users = [];
@@ -23,7 +38,7 @@ end
 % run server infinitely
 while true
     
-    % Compute update locations every 10 minutes
+    % Compute updated locations every 10 minutes
     difference = toc;
     if difference > 600
         OptimizationSetup;
@@ -36,41 +51,19 @@ while true
 %         Thread(st).start;
         display('Client connected');
         
-        % Create input buffer
-        inFromClient = newConnection.getInputStream;
-        display('Opened input stream');
-        %% Read data from client and processit
-        d_inFromClient = DataInputStream(inFromClient);
-        
-        pause(0.5);
-        bytes_available = inFromClient.available;
-        fprintf(1, 'Reading %d bytes\n', bytes_available);
-
-        message = zeros(1, bytes_available, 'uint8');
-        for i = 1:bytes_available
-            message(i) = d_inFromClient.readByte;
-        end
-
-        clientMessage = char(message);
+        [status,clientMessage] = readFromPort(newConnection);
         % if client is a myRio, then send it updated locations.
         if clientMessage(1) == 'L'
                     
             display('Connected client is a myRio');
-            % Create output buffer
-            outToClient = newConnection.getOutputStream;
-            outToClient = DataOutputStream(outToClient);
-            
-            % Send updated locations
-            display(strcat('Writing', int2str(length(message)),'bytes'));   
-            outToClient.writeBytes(char(message));
-            outToClient.flush;   
+            status = writeToPort(newConnection,currentL);
         elseif clientMessage(1) == 'U'
             display('Connected client is a user');
             
         end
 
         % clean up
-%         serverSocket.close;
+        serverSocket.close;
         newConnection.close;
 %         break;
     catch
