@@ -31,25 +31,33 @@ while true
     try
         %% Open input and output datastreams
         newConnection = serverSocket.accept;
-        display('accepted connection from client, opening new thread...');
-        newThread = ServerThread(newConnection);
-        Thread(st).start;
+%         display('accepted connection from client, opening new thread...');
+%         newThread = ServerThread(newConnection);
+%         Thread(st).start;
         display('Client connected');
         
         % Create input buffer
-        inFromClient = newThread.getInputStream;
-        inFromClient = InputStreamReader(inFromClient);
-        inFromClient = BufferedReader(inFromClient);
-
+        inFromClient = newConnection.getInputStream;
+        display('Opened input stream');
         %% Read data from client and processit
-        clientMessage = inFromClient.readline;
+        d_inFromClient = DataInputStream(inFromClient);
         
+        pause(0.5);
+        bytes_available = inFromClient.available;
+        fprintf(1, 'Reading %d bytes\n', bytes_available);
+
+        message = zeros(1, bytes_available, 'uint8');
+        for i = 1:bytes_available
+            message(i) = d_inFromClient.readByte;
+        end
+
+        clientMessage = char(message);
         % if client is a myRio, then send it updated locations.
         if clientMessage(1) == 'L'
                     
             display('Connected client is a myRio');
             % Create output buffer
-            outToClient = newThread.getOutputStream;
+            outToClient = newConnection.getOutputStream;
             outToClient = DataOutputStream(outToClient);
             
             % Send updated locations
@@ -62,8 +70,9 @@ while true
         end
 
         % clean up
-        server_socket.close;
-        output_socket.close;
+%         serverSocket.close;
+        newConnection.close;
+%         break;
     catch
         display('Server accept failed');
     end
