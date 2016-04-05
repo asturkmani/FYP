@@ -8,8 +8,10 @@ import java.io.*
 tic
 
 % create required tables
-rios = [];
-users = [];
+% [name newlocation newdata]
+myRios = cell(0);
+% [name last location]
+users = cell(0);
 %% Create Server on socket
 
 port = 60000;
@@ -52,9 +54,11 @@ while true
         end
 
         clientMessage = char(message);
+        clientMessage = strsplit(clientMessage);
         % if client is a myRio, then send it updated locations.
-        if clientMessage(1) == 'L'
+        if clientMessage{1} == 'L'
                     
+            myRios = addRowToCell(myRios,clientMessage);
             display('Connected client is a myRio');
             % Create output buffer
             outToClient = newConnection.getOutputStream;
@@ -64,9 +68,9 @@ while true
             display(strcat('Writing', int2str(length(message)),'bytes'));   
             outToClient.writeBytes(char(message));
             outToClient.flush;   
-        elseif clientMessage(1) == 'U'
+        elseif clientMessage{1} == 'U'
             display('Connected client is a user');
-            
+            users = addRowToCell(users,clientMessage);
         end
 
         % clean up

@@ -24,7 +24,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     // Degine our variables
     var manager:CLLocationManager!
     var myLocations: [CLLocation] = []
-    
+    let start = NSDate()
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -51,16 +51,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     //location has been updated. Send new loaction to server.
     func locationManager(manager:CLLocationManager, didUpdateLocations locations:[CLLocation]) {
         status.text = "\(locations[0])"
-//        myLocations.append(locations[0] )
         
-        //SET IF CONDITION THAT DISTANCE CHANGED BY A CERTAIN FACTOR.
+        myLocations.append(locations[0])
+        let currentTime = NSDate();
         //SET CONDITION TO IDENTIFY EACH UNIQUE TRANSMISSION.
-        let client:TCPClient = TCPClient(addr: "fypaji.ddns.net", port:60000)
-        let (success, errmsg) = client.connect(timeout: 10)
-        if success {
-//            sendTCPMessage("\(locations[0])", client: client)
-        } else {
-            print(errmsg)
+        
+        let timeInterval: Double = currentTime.timeIntervalSinceDate(start)
+        
+        // Every 5mins, send an update location
+        if timeInterval > 60 {
+            let client:TCPClient = TCPClient(addr: "fypaji.ddns.net", port:60000)
+            let (success, errmsg) = client.connect(timeout: 10)
+            if success {
+              sendTCPMessage("U" + " " + UIDevice.currentDevice().name + " " + "\(locations[0])", client: client)
+            } else {
+                print(errmsg)
+            }
         }
         
         //refocus map region.
