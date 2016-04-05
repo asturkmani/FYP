@@ -6,17 +6,10 @@
 %Set up any test we desire. We can control The field dimensions, the 
 %providing capacity of each UAV, and the demand in each sector.
 
-%The estimated amount of demand in each sector. 
-sectorDemand=[3 10 2; 4 0 1; 0 0 2];
 dimensions = size(sectorDemand);
 rowLength = dimensions(1);
 columnLength=dimensions(2);
 
-CAP=8;
-numberOfBlimps=3;
-GPSMap=[[0;2] [1;2] [2;2] [0;1] [1;1] [2;1] [0;0] [1;0] [2;0]]; %Use this to assign each sector a Lat/Long Location. (1xn format)
-initializing=0; %is this the fist time we call the optimizer or not
-penaltyGain=1; %Increase this to make moving less likely
 
 
 %%
