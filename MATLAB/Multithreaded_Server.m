@@ -21,7 +21,7 @@ initializing=1;
 input_socket = [];
 message_in = [];
 sectorDemand=ones(3);
-%OptimizationSetup
+OptimizationSetup
 % create required tables
 % [name newlocation newdata]
 myRios = cell(0);
