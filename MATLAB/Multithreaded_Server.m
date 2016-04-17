@@ -21,7 +21,7 @@ initializing=1;
 input_socket = [];
 message_in = [];
 sectorDemand=ones(3);
-OptimizationSetup
+% OptimizationSetup
 % create required tables
 % [name newlocation newdata]
 myRios = cell(0);
@@ -29,7 +29,7 @@ myRios = cell(0);
 users = cell(0);
 %% Create Server on socket
 
-port = 60000;
+port = 2057;
 %Open socket
 try 
     serverSocket = ServerSocket(port);
@@ -51,6 +51,7 @@ while true
 %         display('accepted connection from client, opening new thread...');
 %         newThread = ServerThread(newConnection);
 %         Thread(st).start;
+        
         display('Client connected');
         [status,clientMessage] = readFromPort(newConnection);
         clientMessage = strsplit(clientMessage);
@@ -58,7 +59,8 @@ while true
         if clientMessage{1} == 'L'      
             myRios = addRowToCell(myRios,clientMessage);
             display('Connected client is a myRio');
-            status = writeToPort(newConnection,currentL);
+            status = writeToPort(newConnection,'hello');
+%             status = writeToPort(newConnection,currentL);
         elseif clientMessage(1) == 'U'
             display('Connected client is a user');
             users = addRowToCell(users,clientMessage);
